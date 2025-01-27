@@ -1,4 +1,5 @@
 import requests
+from typing import Dict, Tuple
 
 
 class IntercomAPIService:
@@ -8,17 +9,19 @@ class IntercomAPIService:
         )
         self.base_url = "https://api.intercom.io/"
 
-    def get_all_admins(self):
+    def get_all_admins(self) -> Tuple[int, Dict | None]:
         url: str = self.base_url + "admins"
         headers = {
             "Intercom-Version": "2.12",
             f"Authorization": f"Bearer {self.access_token}",
         }
         response = requests.get(url, headers=headers)
-        print(response.status_code)
-        print(response.json())
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
-    def create_admin(self, admin_email: str):
+    def create_admin(self, admin_email: str) -> Tuple[int, Dict | None]:
         url: str = self.base_url + "admins"
         headers = {
             "Content-Type": "application/json",
@@ -28,10 +31,14 @@ class IntercomAPIService:
 
         payload = {"email": admin_email, "role": "operator", "name": "ilya"}
         response = requests.post(url, headers=headers, json=payload)
-        print(response.status_code)
-        print(response.json())
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
-    def create_conversation(self, user_id: str, message: str):
+    def create_conversation(
+        self, user_id: str, message: str
+    ) -> Tuple[int, Dict | None]:
         url: str = self.base_url + "conversations"
         headers = {
             "Content-Type": "application/json",
@@ -40,8 +47,14 @@ class IntercomAPIService:
         }
         payload = {"from": {"type": "user", "id": user_id}, "body": message}
         response = requests.post(url, headers=headers, json=payload)
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
-    def attach_admin_to_conversation(self, admin_id: str, conversation_id: str):
+    def attach_admin_to_conversation(
+        self, admin_id: str, conversation_id: str
+    ) -> Tuple[int, Dict | None]:
         url = f"https://api.intercom.io/conversations/{conversation_id}/parts"
         headers = {
             "Content-Type": "application/json",
@@ -50,11 +63,14 @@ class IntercomAPIService:
         }
         payload = {"admin_id": admin_id, "message_type": "assignment", "type": "admin"}
         response = requests.post(url, headers=headers, json=payload)
-        return response.json() if response.status_code == 200 else None
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
     def add_admin_note_to_conversation(
         self, conversation_id: str, admin_id: str, note: str
-    ):
+    ) -> Tuple[int, Dict | None]:
         url = f"https://api.intercom.io/conversations/{conversation_id}/reply"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -68,11 +84,14 @@ class IntercomAPIService:
             "body": note,
         }
         response = requests.post(url, json=payload, headers=headers)
-        print(response.status_code)
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
     def add_admin_message_to_conversation(
         self, conversation_id: str, admin_id: str, message: str
-    ):
+    ) -> Tuple[int, Dict | None]:
         url = f"https://api.intercom.io/conversations/{conversation_id}/reply"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -86,9 +105,12 @@ class IntercomAPIService:
             "body": message,
         }
         response = requests.post(url, json=payload, headers=headers)
-        print(response.status_code)
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
 
-    def create_user(self, email: str):
+    def create_user(self, email: str) -> Tuple[int, Dict | None]:
         url: str = self.base_url + "contacts"
         headers = {
             "Content-Type": "application/json",
@@ -97,4 +119,7 @@ class IntercomAPIService:
         }
         payload = {"email": email}
         response = requests.post(url, headers=headers, json=payload)
-        print(response.status_code)
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
