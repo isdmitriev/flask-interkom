@@ -59,13 +59,20 @@ class IntercomAPIService:
         headers = {
             "Content-Type": "application/json",
             "Intercom-Version": "2.12",
+            "Accept": "application/json",
             f"Authorization": f"Bearer {self.access_token}",
         }
-        payload = {"admin_id": admin_id, "message_type": "assignment", "type": "admin"}
+        payload = {
+            "message_type": "assignment",
+            "type": "admin",
+            "admin_id": admin_id,
+            "assignee_id": admin_id,
+        }
         response = requests.post(url, headers=headers, json=payload)
         if response.status_code == 200:
             return response.status_code, response.json()
         else:
+
             return response.status_code, None
 
     def add_admin_note_to_conversation(
@@ -83,6 +90,7 @@ class IntercomAPIService:
             "message_type": "note",
             "body": note,
         }
+
         response = requests.post(url, json=payload, headers=headers)
         if response.status_code == 200:
             return response.status_code, response.json()
@@ -135,3 +143,21 @@ class IntercomAPIService:
             return response.status_code, response.json()
         else:
             return response.status_code, None
+
+    def get_conversation_by_id(self, conversation_id: str) -> Tuple[int, Dict | None]:
+        url: str = f"https://api.intercom.io/conversations/{conversation_id}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Intercom-Version": "2.12",
+            "Accept": "application/json",
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.status_code, response.json()
+            else:
+                return response.status_code, None
+
+        except requests.exceptions.RequestException as e:
+            print(f"Ошибка при получении информации о беседе: {e}")
+            return 0, None
