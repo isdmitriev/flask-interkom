@@ -18,10 +18,11 @@ def handler():
 def webhook():
     if request.is_json == True:
         data: Dict = request.get_json()
+
         topic = data.get("topic", "")
         if topic == "conversation.user.created":
             conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
-            print(topic)
+
         elif topic == "conversation.user.replied":
             conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
             message: str = (
@@ -30,7 +31,7 @@ def webhook():
                 .get("conversation_message", {})
                 .get("body", "")
             )
-            print(topic)
+
         elif topic == "conversation.admin.replied":
             conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
             message: str = (
@@ -39,7 +40,7 @@ def webhook():
                 .get("conversation_message", {})
                 .get("body", "")
             )
-            print(topic)
+
         elif topic == "conversation.admin.noted":
             conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
             messages: str = (
@@ -50,9 +51,8 @@ def webhook():
             )
 
         else:
-            print("None")
+            return jsonify({"status": "success", "message": "Webhook received"}), 200
 
-        return jsonify({"status": "success", "message": "Webhook received"}), 200
     else:
         return jsonify({"status": "error", "message": "Invalid request format"}), 400
 
@@ -63,4 +63,4 @@ def hello_world():  # put application's code here
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5000, debug=True)

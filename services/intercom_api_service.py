@@ -123,3 +123,15 @@ class IntercomAPIService:
             return response.status_code, response.json()
         else:
             return response.status_code, None
+
+    def get_all_users(self) -> Tuple[int, Dict | None]:
+        url: str = self.base_url + "contacts"
+        headers = {
+            "Intercom-Version": "2.12",
+            "Authorization": f"Bearer {self.access_token}",
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.status_code, response.json()
+        else:
+            return response.status_code, None
