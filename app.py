@@ -4,14 +4,51 @@ from typing import Dict
 app = Flask(__name__)
 
 
-@app.route("/conversations/assigns", methods=["POST"])
-def handler():
-    if request.is_json == True:
-        print(request.get_json())
-        return jsonify({"status": "success", "message": "Webhook received"}), 200
-    else:
+def handle_conversation_user_created(data):
+    conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
+    print(conversation_id)
+    return jsonify({"status": "success", "message": "Webhook received"}), 200
 
-        return jsonify({"status": "error", "message": "Invalid request format"}), 400
+
+def handle_conversation_user_replied(data):
+    conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
+    message: str = (
+        data.get("data", {})
+        .get("item", {})
+        .get("conversation_message", {})
+        .get("body", "")
+    )
+    print(f'{conversation_id}:{message}')
+    return jsonify({"status": "success", "message": "Webhook received"}), 200
+
+
+def handle_conversation_admin_replied(data):
+    conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
+    message: str = (
+        data.get("data", {})
+        .get("item", {})
+        .get("conversation_message", {})
+        .get("body", "")
+    )
+    print(f'{conversation_id}:{message}')
+    return jsonify({"status": "success", "message": "Webhook received"}), 200
+
+
+def handle_conversation_admin_noted(data):
+    conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
+    message: str = (
+        data.get("data", {})
+        .get("item", {})
+        .get("conversation_message", {})
+        .get("body", "")
+    )
+    print(f'{conversation_id}:{message}:note')
+    return jsonify({"status": "success", "message": "Webhook received"}), 200
+
+
+def handle_conversation_admin_assigned(data):
+    print('admin assigned')
+    return jsonify({"status": "success", "message": "Webhook received"}), 200
 
 
 @app.route("/conversations/messages", methods=["POST"])
@@ -21,34 +58,18 @@ def webhook():
 
         topic = data.get("topic", "")
         if topic == "conversation.user.created":
-            conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
+            return handle_conversation_user_created(data)
 
         elif topic == "conversation.user.replied":
-            conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
-            message: str = (
-                data.get("data", {})
-                .get("item", {})
-                .get("conversation_message", {})
-                .get("body", "")
-            )
+            return handle_conversation_user_replied(data)
 
         elif topic == "conversation.admin.replied":
-            conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
-            message: str = (
-                data.get("data", {})
-                .get("item", {})
-                .get("conversation_message", {})
-                .get("body", "")
-            )
+            return handle_conversation_admin_replied(data)
 
         elif topic == "conversation.admin.noted":
-            conversation_id: str = data.get("data", {}).get("item", {}).get("id", "")
-            messages: str = (
-                data.get("data", {})
-                .get("item", {})
-                .get("conversation_message", {})
-                .get("body", "")
-            )
+            return handle_conversation_admin_noted(data)
+        elif topic == "conversation.admin.assigned":
+            return handle_conversation_admin_assigned(data)
 
         else:
             return jsonify({"status": "success", "message": "Webhook received"}), 200
