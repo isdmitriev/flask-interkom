@@ -1,7 +1,18 @@
 from flask import Flask, request, jsonify
 from typing import Dict
+import sys
+import logging
 
 app = Flask(__name__)
+
+
+def setup_logger():
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+    logger.addHandler(handler)
+    return logger
 
 
 def handle_conversation_user_created(data):
@@ -18,7 +29,7 @@ def handle_conversation_user_replied(data):
         .get("conversation_message", {})
         .get("body", "")
     )
-    print(f'{conversation_id}:{message}')
+    print(f"{conversation_id}:{message}")
     return jsonify({"status": "success", "message": "Webhook received"}), 200
 
 
@@ -30,7 +41,7 @@ def handle_conversation_admin_replied(data):
         .get("conversation_message", {})
         .get("body", "")
     )
-    print(f'{conversation_id}:{message}')
+    print(f"{conversation_id}:{message}")
     return jsonify({"status": "success", "message": "Webhook received"}), 200
 
 
@@ -42,13 +53,16 @@ def handle_conversation_admin_noted(data):
         .get("conversation_message", {})
         .get("body", "")
     )
-    print(f'{conversation_id}:{message}:note')
+    print(f"{conversation_id}:{message}:note")
     return jsonify({"status": "success", "message": "Webhook received"}), 200
 
 
 def handle_conversation_admin_assigned(data):
-    print('admin assigned')
+    print("admin assigned")
     return jsonify({"status": "success", "message": "Webhook received"}), 200
+
+
+logger = setup_logger()
 
 
 @app.route("/conversations/messages", methods=["POST"])
@@ -79,9 +93,11 @@ def webhook():
 
 
 @app.route("/")
-def hello_world():  # put application's code here
+def hello_world():
+    logger.info("path requested")
+    # put application's code here
     return "Hello World!"
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True,host="0.0.0.0")
+    app.run(port=5000, debug=True, host="0.0.0.0")
