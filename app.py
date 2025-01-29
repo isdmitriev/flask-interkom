@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from typing import Dict
 import sys
 import logging
-
+import os
 app = Flask(__name__)
 
 
@@ -100,4 +100,5 @@ def hello_world():
 
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True, host="0.0.0.0")
+    port=int(os.environ.get('PORT',8000))
+    app.run(port=port,host="0.0.0.0")
